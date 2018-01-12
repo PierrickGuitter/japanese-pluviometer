@@ -41,11 +41,11 @@ void main(void)
             btn_triggered = 0;
         }else if( ReadByte(REG_INTERRUPT_STATUS_GPIO) & 0x01 ) {
             error = (ReadByte(REG_RESULT_RANGE_STATUS) & 0xF0) >> 4;
-            if( error == 0 && timerA_state == 1) {
+            if( error == 0 && TAstate == LCD_Timer) {
                 count++;
                 // timer (1 sec) for count
                 timerA_configuration(1);
-                timerA_state = 2;
+                TAstate = Prox_detection;
                 __bis_SR_register(LPM3_bits);
             }
             WriteByte(REG_SYS_INT_CLEAR, 0x07);
@@ -73,10 +73,10 @@ __interrupt void Port_1()
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void Timer_A (void)
 {
-    if(timerA_state == 1) {
+    if(TAstate == LCD_Timer) {
         P1OUT &= ~BIT4;                  // Toggle LCD_BK
-    }else if(timerA_state == 2) {
-        timerA_state = 1;
+    }else if(TAstate == Prox_detection) {
+        TAstate = LCD_Timer;
     }
     TA0CCTL0 = 0;
     __bic_SR_register_on_exit(LPM3_bits);

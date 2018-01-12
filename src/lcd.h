@@ -23,7 +23,12 @@
 
 #define LCD_MASK    (LCD_DB4 | LCD_DB5 | LCD_DB6 | LCD_DB7 | LCD_RS | LCD_EN)
 
-unsigned char timerA_state = 0;
+
+typedef enum { Init=0, LCD_Timer=1, Prox_detection=2 } timerA_state;
+
+timerA_state TAstate = Init;
+
+
 
 void timer_sleep(int delay) {
   TA0CCR0 = 2;
@@ -148,7 +153,7 @@ void LCD_INIT(void)
 
     clear_screen();
 
-    timerA_state = 1;
+    TAstate = LCD_Timer;
 }
 
 void LCD_print(char* string)

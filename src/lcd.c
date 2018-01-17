@@ -5,36 +5,14 @@
  */
 #include <msp430.h>
 #include "lcd.h"
+#include "timer.h"
 
-timerA_state TAstate = Init;
-
-void timer_sleep(int delay) {
-  TA0CCR0 = 2;
-  TA0CTL = TASSEL_1 + MC_2;
-  int  i;
-  for(i = delay; i > 0; --i) {
-    TA0R = 0;
-    TA0CCTL0 = CCIE;
-    while(TA0R < 2) {
-      __bis_SR_register(LPM3_bits|GIE);
-      __no_operation();
-    }
-  }
-  TA0CTL = 0;
-}
-
-
-void timerA_configuration(int sec)
+void GPIO_init(void)
 {
-    CCTL0 = CCIE;                   // CCR0 interrupt enabled
-    CCR0 = 512*sec;                 // 2559 -> 5 sec
-    TA0R = 0;
-    TACTL = TASSEL_1 + ID_3 + MC_1;
-}
+    // deactivate Port 3 (unused)
+    P3DIR = 0xFF;
+    P3OUT = 0x00;
 
-
-void GPIO_Init(void)
-{
     // Port 1. Bit0 --> LCD on/off btn
     // Port 1. Bit1 --> Vl6180X int
 
@@ -107,7 +85,7 @@ void Set_new_line(void)
     send_cmd(0xC0);
 }
 
-void LCD_INIT(void)
+void LCD_init(void)
 {
     P2DIR |= LCD_MASK;
     P2OUT &= ~LCD_MASK;
@@ -139,8 +117,7 @@ void LCD_print(char* string)
     char *c;
     c = string;
 
-    while ((c != 0) && (*c != 0))
-    {
+    while ((c != 0) && (*c != 0)) {
         send_data(*c);
         c++;
     }
@@ -156,10 +133,10 @@ void DisplayInt(unsigned int value)
   do {
       tmp_value /=10;
       ValSize++;
-  } while( tmp_value );
+  } while (tmp_value);
 
 
-  switch(ValSize) {
+  switch (ValSize) {
       case 6 :
           tmp_value = value / 100000;
           Byte = tmp_value + '0';

@@ -21,21 +21,13 @@
 #define LCD_BK      BIT4
 #define LCD_MASK    (LCD_DB4 | LCD_DB5 | LCD_DB6 | LCD_DB7 | LCD_RS | LCD_EN)
 
-
-typedef enum { Init=0, LCD_Timer=1, Prox_detection=2 } timerA_state;
-extern timerA_state TAstate;
-
-
-void LCD_INIT(void);
+void LCD_init(void);
 void Set_new_line(void);
 void LCD_print(char* string);
 void clear_screen(void);
 void display_on();
 void display_off();
-void GPIO_Init(void);
+void GPIO_init(void);
 void DisplayPluvioStats(unsigned int count);
-
-void timerA_configuration(int sec);
-
 
 #endif /* LCD_H_ */

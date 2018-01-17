@@ -68,7 +68,7 @@ unsigned char ReadByte(unsigned short Reg)
 
 void VL6180X_Init(void)
 {
-    if(ReadByte(REG_SYS_FRESH_OUT_OF_RST) == 0x01) {
+    if (ReadByte(REG_SYS_FRESH_OUT_OF_RST) == 0x01) {
         // Mandatory : private registers
         WriteByte(0x0207, 0x01);
         WriteByte(0x0208, 0x01);
@@ -109,7 +109,7 @@ void VL6180X_Init(void)
     WriteByte(REG_SYS_GPI1_MODE,0x30);
     WriteByte(REG_SYS_INT_GPIO, 0x01);
     WriteByte(REG_SYS_HIST_CTRL, 0x01);
-    WriteByte(REG_RANGE_THRESH_LOW, 0x50);  //50 mm
+    WriteByte(REG_RANGE_THRESH_LOW, 0x80);  //80 mm
     WriteByte(REG_RANGE_INTERMSR_PERIOD, 0x0F); //every 200ms
     WriteByte(REG_RANGE_CONV_TIME,0x1D);
 
@@ -117,14 +117,16 @@ void VL6180X_Init(void)
     WriteByte(REG_SYS_GRP_PARAM_HOLD,0x00);
 
 
+    // allow only ignore range
+    WriteByte(REG_RANGE_CHECK_ENABLES,0x02);
+    WriteByte(REG_RANGE_IGNORE_HEIGHT,0x30);
+    WriteByte(REG_RANGE_IGNORE_THRESH,0x0F);
+
     /*
     WriteByte(REG_RANGE_CROSSTALK_RATE);
     WriteByte(REG_RANGE_CROSSTALK_HEIGHT);
-
     WriteByte(REG_RANGE_ECE_ESTIMATE);
     WriteByte(REG_RANGE_P2P_OFFSET);
-    WriteByte(REG_RANGE_IGNORE_HEIGHT);
-    WriteByte(REG_RANGE_IGNORE_THRESH);
     WriteByte(REG_RANGE_MAX_AMB_LVL);
     WriteByte(REG_RANGE_CHECK_ENABLES);
     WriteByte(REG_RANGE_VHV_RECALIBRATE);
@@ -144,8 +146,8 @@ int VL6180X_Single_Shot_Range(void)
     int result_range = 0;
 
     WriteByte(REG_RANGE_START, 0x01);
-    while( !(ReadByte(REG_INTERRUPT_STATUS_GPIO) & 0x04)) {
-        if(ReadByte(REG_RESULT_RANGE_STATUS) != 0x00) {
+    while (!(ReadByte(REG_INTERRUPT_STATUS_GPIO) & 0x04)) {
+        if (ReadByte(REG_RESULT_RANGE_STATUS) != 0x00) {
             return ReadByte(REG_RESULT_RANGE_STATUS);
         }
     }
@@ -161,7 +163,7 @@ int VL6180X_Single_Shot_Range(void)
 __interrupt void USCIAB0TX_ISR(void)
 {
     //transmitter mode only for now
-    switch(AddrLen) {
+    switch (AddrLen) {
         case 2:
             UCB0TXBUF = (RegAddr >> 8) & 0xFF;
             AddrLen--;
@@ -171,16 +173,16 @@ __interrupt void USCIAB0TX_ISR(void)
             AddrLen--;
             break;
         case 0:
-            if(DataLen){                                                    // this part only works with single data
-                if(IFG2 & UCB0TXIFG){
+            if (DataLen) {                                                    // this part only works with single data
+                if (IFG2 & UCB0TXIFG) {
                     UCB0TXBUF = TXData;
-                }else if(IFG2 & UCB0RXIFG) {
+                } else if (IFG2 & UCB0RXIFG) {
                     RXData = UCB0RXBUF;
                     __bic_SR_register_on_exit(LPM3_bits);
                 }
                 DataLen--;
-            }else{
-                if(IFG2 & UCB0TXIFG){
+            } else {
+                if (IFG2 & UCB0TXIFG) {
                     UCB0CTL1 |= UCTXSTP;
                     IFG2 &= ~UCB0TXIFG;
                     __bic_SR_register_on_exit(LPM3_bits);

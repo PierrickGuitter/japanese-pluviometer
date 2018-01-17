@@ -10,7 +10,7 @@ unsigned char DataLen = 0, AddrLen = 0, TXData = 0, RXData = 0;
 unsigned short RegAddr = 0;
 
 
-void I2C_init(void)
+void i2c_init(void)
 {
     // Configure Pins for I2C
     P1SEL |= BIT6 + BIT7;       // Assign I2C pins to USCI_B0
@@ -28,7 +28,7 @@ void I2C_init(void)
 }
 
 
-void TransmitData(unsigned char AddrLength, unsigned char TXdatalen)
+void i2c_transmit_data(unsigned char AddrLength, unsigned char TXdatalen)
 {
     AddrLen = AddrLength;
     DataLen = TXdatalen;                      // Bytes Data
@@ -37,7 +37,7 @@ void TransmitData(unsigned char AddrLength, unsigned char TXdatalen)
     __bis_SR_register(LPM3_bits + GIE);
 }
 
-void ReceiveData(unsigned char RXlength)
+void i2c_receive_data(unsigned char RXlength)
 {
     DataLen = RXlength;
     AddrLen = 0;                            // done by transmit
@@ -50,109 +50,109 @@ void ReceiveData(unsigned char RXlength)
  }
 
 
-void WriteByte(unsigned short Reg, unsigned char data)
+void vl6180x_write_byte(unsigned short Reg, unsigned char data)
 {
     TXData = data;
     RegAddr = Reg;
-    TransmitData(2,1);
+    i2c_transmit_data(2,1);
 }
 
-unsigned char ReadByte(unsigned short Reg)
+unsigned char vl6180x_read_byte(unsigned short Reg)
 {
     RegAddr = Reg;
-    TransmitData(2,0);
-    ReceiveData(1);
+    i2c_transmit_data(2,0);
+    i2c_receive_data(1);
 
     return RXData;
 }
 
-void VL6180X_Init(void)
+void vl6180x_init(void)
 {
-    if (ReadByte(REG_SYS_FRESH_OUT_OF_RST) == 0x01) {
+    if (vl6180x_read_byte(REG_SYS_FRESH_OUT_OF_RST) == 0x01) {
         // Mandatory : private registers
-        WriteByte(0x0207, 0x01);
-        WriteByte(0x0208, 0x01);
-        WriteByte(0x0096, 0x00);
-        WriteByte(0x0097, 0xfd);
-        WriteByte(0x00e3, 0x00);
-        WriteByte(0x00e4, 0x04);
-        WriteByte(0x00e5, 0x02);
-        WriteByte(0x00e6, 0x01);
-        WriteByte(0x00e7, 0x03);
-        WriteByte(0x00f5, 0x02);
-        WriteByte(0x00d9, 0x05);
-        WriteByte(0x00db, 0xce);
-        WriteByte(0x00dc, 0x03);
-        WriteByte(0x00dd, 0xf8);
-        WriteByte(0x009f, 0x00);
-        WriteByte(0x00a3, 0x3c);
-        WriteByte(0x00b7, 0x00);
-        WriteByte(0x00bb, 0x3c);
-        WriteByte(0x00b2, 0x09);
-        WriteByte(0x00ca, 0x09);
-        WriteByte(0x0198, 0x01);
-        WriteByte(0x01b0, 0x17);
-        WriteByte(0x01ad, 0x00);
-        WriteByte(0x00ff, 0x05);
-        WriteByte(0x0100, 0x05);
-        WriteByte(0x0199, 0x05);
-        WriteByte(0x01a6, 0x1b);
-        WriteByte(0x01ac, 0x3e);
-        WriteByte(0x01a7, 0x1f);
-        WriteByte(0x0030, 0x00);
+        vl6180x_write_byte(0x0207, 0x01);
+        vl6180x_write_byte(0x0208, 0x01);
+        vl6180x_write_byte(0x0096, 0x00);
+        vl6180x_write_byte(0x0097, 0xfd);
+        vl6180x_write_byte(0x00e3, 0x00);
+        vl6180x_write_byte(0x00e4, 0x04);
+        vl6180x_write_byte(0x00e5, 0x02);
+        vl6180x_write_byte(0x00e6, 0x01);
+        vl6180x_write_byte(0x00e7, 0x03);
+        vl6180x_write_byte(0x00f5, 0x02);
+        vl6180x_write_byte(0x00d9, 0x05);
+        vl6180x_write_byte(0x00db, 0xce);
+        vl6180x_write_byte(0x00dc, 0x03);
+        vl6180x_write_byte(0x00dd, 0xf8);
+        vl6180x_write_byte(0x009f, 0x00);
+        vl6180x_write_byte(0x00a3, 0x3c);
+        vl6180x_write_byte(0x00b7, 0x00);
+        vl6180x_write_byte(0x00bb, 0x3c);
+        vl6180x_write_byte(0x00b2, 0x09);
+        vl6180x_write_byte(0x00ca, 0x09);
+        vl6180x_write_byte(0x0198, 0x01);
+        vl6180x_write_byte(0x01b0, 0x17);
+        vl6180x_write_byte(0x01ad, 0x00);
+        vl6180x_write_byte(0x00ff, 0x05);
+        vl6180x_write_byte(0x0100, 0x05);
+        vl6180x_write_byte(0x0199, 0x05);
+        vl6180x_write_byte(0x01a6, 0x1b);
+        vl6180x_write_byte(0x01ac, 0x3e);
+        vl6180x_write_byte(0x01a7, 0x1f);
+        vl6180x_write_byte(0x0030, 0x00);
 
-        WriteByte(REG_SYS_FRESH_OUT_OF_RST,0x00);
+        vl6180x_write_byte(REG_SYS_FRESH_OUT_OF_RST,0x00);
     }
 
-    WriteByte(REG_SYS_GRP_PARAM_HOLD,0x01);
+    vl6180x_write_byte(REG_SYS_GRP_PARAM_HOLD,0x01);
 
-    WriteByte(REG_SYS_GPI1_MODE,0x30);
-    WriteByte(REG_SYS_INT_GPIO, 0x01);
-    WriteByte(REG_SYS_HIST_CTRL, 0x01);
-    WriteByte(REG_RANGE_THRESH_LOW, 0x80);  //80 mm
-    WriteByte(REG_RANGE_INTERMSR_PERIOD, 0x0F); //every 200ms
-    WriteByte(REG_RANGE_CONV_TIME,0x1D);
+    vl6180x_write_byte(REG_SYS_GPI1_MODE,0x30);
+    vl6180x_write_byte(REG_SYS_INT_GPIO, 0x01);
+    vl6180x_write_byte(REG_SYS_HIST_CTRL, 0x01);
+    vl6180x_write_byte(REG_RANGE_THRESH_LOW, 0x80);  //80 mm
+    vl6180x_write_byte(REG_RANGE_INTERMSR_PERIOD, 0x0F); //every 200ms
+    vl6180x_write_byte(REG_RANGE_CONV_TIME,0x1D);
 
 
-    WriteByte(REG_SYS_GRP_PARAM_HOLD,0x00);
+    vl6180x_write_byte(REG_SYS_GRP_PARAM_HOLD,0x00);
 
 
     // allow only ignore range
-    WriteByte(REG_RANGE_CHECK_ENABLES,0x02);
-    WriteByte(REG_RANGE_IGNORE_HEIGHT,0x30);
-    WriteByte(REG_RANGE_IGNORE_THRESH,0x0F);
+    vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x02);
+    vl6180x_write_byte(REG_RANGE_IGNORE_HEIGHT,0x30);
+    vl6180x_write_byte(REG_RANGE_IGNORE_THRESH,0x0F);
 
     /*
-    WriteByte(REG_RANGE_CROSSTALK_RATE);
-    WriteByte(REG_RANGE_CROSSTALK_HEIGHT);
-    WriteByte(REG_RANGE_ECE_ESTIMATE);
-    WriteByte(REG_RANGE_P2P_OFFSET);
-    WriteByte(REG_RANGE_MAX_AMB_LVL);
-    WriteByte(REG_RANGE_CHECK_ENABLES);
-    WriteByte(REG_RANGE_VHV_RECALIBRATE);
-    WriteByte(REG_RANGE_VHV_REPEAT_RATE);*/
+    vl6180x_write_byte(REG_RANGE_CROSSTALK_RATE);
+    vl6180x_write_byte(REG_RANGE_CROSSTALK_HEIGHT);
+    vl6180x_write_byte(REG_RANGE_ECE_ESTIMATE);
+    vl6180x_write_byte(REG_RANGE_P2P_OFFSET);
+    vl6180x_write_byte(REG_RANGE_MAX_AMB_LVL);
+    vl6180x_write_byte(REG_RANGE_CHECK_ENABLES);
+    vl6180x_write_byte(REG_RANGE_VHV_RECALIBRATE);
+    vl6180x_write_byte(REG_RANGE_VHV_REPEAT_RATE);*/
 
 
 }
 
-void VL6180X_Continuous_Shot_Range(void)
+void vl6180x_continuous_shot_range(void)
 {
-    WriteByte(REG_RANGE_START, 0x03);
+    vl6180x_write_byte(REG_RANGE_START, 0x03);
 }
 
 
-int VL6180X_Single_Shot_Range(void)
+int vl6180x_single_shot_range(void)
 {
     int result_range = 0;
 
-    WriteByte(REG_RANGE_START, 0x01);
-    while (!(ReadByte(REG_INTERRUPT_STATUS_GPIO) & 0x04)) {
-        if (ReadByte(REG_RESULT_RANGE_STATUS) != 0x00) {
-            return ReadByte(REG_RESULT_RANGE_STATUS);
+    vl6180x_write_byte(REG_RANGE_START, 0x01);
+    while (!(vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x04)) {
+        if (vl6180x_read_byte(REG_RESULT_RANGE_STATUS) != 0x00) {
+            return vl6180x_read_byte(REG_RESULT_RANGE_STATUS);
         }
     }
-    result_range = ReadByte(REG_RANGE_VAL);
-    WriteByte(REG_SYS_INT_CLEAR, 0x07);
+    result_range = vl6180x_read_byte(REG_RANGE_VAL);
+    vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x07);
     return result_range;
 }
 

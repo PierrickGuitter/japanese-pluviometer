@@ -12,23 +12,23 @@ void main(void)
     WDTCTL = WDTPW + WDTHOLD;             // Stop watchdog timer
 
     clock_init();
-    GPIO_init();
-    LCD_init();
-    I2C_init();
-    VL6180X_Init();
-    VL6180X_Continuous_Shot_Range();
+    gpio_init();
+    lcd_init();
+    i2c_init();
+    vl6180x_init();
+    vl6180x_continuous_shot_range();
 
     __bis_SR_register(GIE);
 
     while (1) {
         if (btn_triggered == 1) {
-            DisplayPluvioStats(count);
+            lcd_display_pluvio(count);
             timerA_configuration(5);
             count = 0;
             __bis_SR_register(LPM3_bits);
             btn_triggered = 0;
-        } else if (ReadByte(REG_INTERRUPT_STATUS_GPIO) & 0x01) {
-            error = (ReadByte(REG_RESULT_RANGE_STATUS) & 0xF0) >> 4;
+        } else if (vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x01) {
+            error = (vl6180x_read_byte(REG_RESULT_RANGE_STATUS) & 0xF0) >> 4;
             if (error == 0 && TAstate == LCD_Timer) {
                 count++;
                 // timer (1 sec) for count
@@ -36,7 +36,7 @@ void main(void)
                 TAstate = Prox_detection;
                 __bis_SR_register(LPM3_bits);
             }
-            WriteByte(REG_SYS_INT_CLEAR, 0x07);
+            vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x07);
             btn_triggered = 0;
         }
     }

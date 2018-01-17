@@ -41,16 +41,16 @@
 
 
 //  I2C & VL6180X API
-void I2C_init(void);
-void WriteByte(unsigned short Reg, unsigned char data);
-unsigned char ReadByte(unsigned short Reg);
-void VL6180X_Init(void);
-int VL6180X_Single_Shot_Range(void);
-void VL6180X_Continuous_Shot_Range(void);
+void i2c_init(void);
+void vl6180x_write_byte(unsigned short Reg, unsigned char data);
+unsigned char vl6180x_read_byte(unsigned short Reg);
+void vl6180x_init(void);
+int vl6180x_single_shot_range(void);
+void vl6180x_continuous_shot_range(void);
 
 //  Private functions
-void TransmitData(unsigned char AddrLength, unsigned char TXdatalen);
-void ReceiveData(unsigned char RXlength);
+void i2c_transmit_data(unsigned char AddrLength, unsigned char TXdatalen);
+void i2c_receive_data(unsigned char RXlength);
 
 
 #endif /* VL6180X_H_ */

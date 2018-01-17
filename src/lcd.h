@@ -21,13 +21,13 @@
 #define LCD_BK      BIT4
 #define LCD_MASK    (LCD_DB4 | LCD_DB5 | LCD_DB6 | LCD_DB7 | LCD_RS | LCD_EN)
 
-void LCD_init(void);
-void Set_new_line(void);
-void LCD_print(char* string);
-void clear_screen(void);
-void display_on();
-void display_off();
-void GPIO_init(void);
-void DisplayPluvioStats(unsigned int count);
+void lcd_init(void);
+void lcd_set_new_line(void);
+void lcd_print(char* string);
+void lcd_clear_screen(void);
+void lcd_display_on();
+void lcd_display_off();
+void gpio_init(void);
+void lcd_display_pluvio(unsigned int count);
 
 #endif /* LCD_H_ */

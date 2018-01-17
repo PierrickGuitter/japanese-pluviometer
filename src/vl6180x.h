@@ -40,17 +40,34 @@
 #define REG_RANGE_VAL               0x0062
 
 
-//  I2C & VL6180X API
-void i2c_init(void);
-void vl6180x_write_byte(unsigned short Reg, unsigned char data);
-unsigned char vl6180x_read_byte(unsigned short Reg);
+/*
+ *  vl6180x_init
+ */
 void vl6180x_init(void);
+
+/*
+ *  vl6180x_write_byte
+ *      - Reg               : slave reg addr
+ *      - data              : data to write
+ */
+void vl6180x_write_byte(unsigned short Reg, unsigned char data);
+
+/*
+ *  vl6180x_read_byte
+ *      - Reg               : slave reg addr
+ *      - return value      : value from slave Reg addr
+ */
+unsigned char vl6180x_read_byte(unsigned short Reg);
+
+/*
+ *  vl6180x_single_shot_range
+ *      - return value      : range from vl6180x to object or error status
+ */
 int vl6180x_single_shot_range(void);
+
+/*
+ *  vl6180x_continuous_shot_range
+ */
 void vl6180x_continuous_shot_range(void);
-
-//  Private functions
-void i2c_transmit_data(unsigned char AddrLength, unsigned char TXdatalen);
-void i2c_receive_data(unsigned char RXlength);
-
 
 #endif /* VL6180X_H_ */

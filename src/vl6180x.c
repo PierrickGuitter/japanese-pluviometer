@@ -10,64 +10,84 @@ unsigned char DataLen = 0, AddrLen = 0, TXData = 0, RXData = 0;
 unsigned short RegAddr = 0;
 
 
-void i2c_init(void)
-{
-    // Configure Pins for I2C
-    P1SEL |= BIT6 + BIT7;       // Assign I2C pins to USCI_B0
-    P1SEL2 |= BIT6 + BIT7;       // Assign I2C pins to USCI_B0
+////////////////////////////////////////////////
+//  I2C Init, receive and transmit functions  //
+//  Only called by vl6180x functions          //
+////////////////////////////////////////////////
 
+
+/*
+ *  i2c_init:
+ *   - Init gpios for SDA and SCL
+ *   - I2C master synchronous, 7 bit addr
+ *   - ACLK clock divided by 12
+ *   - transmit and emit
+ */
+static void i2c_init(void)
+{
+    P1SEL |= BIT6 + BIT7;
+    P1SEL2 |= BIT6 + BIT7;
 
     UCB0CTL1 |= UCSWRST;
     UCB0CTL0 = UCMST + UCMODE_3 + UCSYNC;
-    UCB0CTL1 = UCSSEL_2 + UCSWRST;              //USSEL -> clock selection
-    UCB0BR0 = 12;                               //Clock divider LSB
-    UCB0BR1 = 0;                                //MSB
+    UCB0CTL1 = UCSSEL_2 + UCSWRST;
+    UCB0BR0 = 12;
+    UCB0BR1 = 0;
     UCB0I2CSA = VL6180X_ADDR;
     UCB0CTL1 &= ~UCSWRST;
     IE2 |= UCB0TXIE + UCB0RXIE;
 }
 
 
-void i2c_transmit_data(unsigned char AddrLength, unsigned char TXdatalen)
+/*
+ *  i2c_transmit_data:
+ *  transmit txdatalen bytes
+ */
+static void i2c_transmit_data(unsigned char AddrLength, unsigned char TXdatalen)
 {
     AddrLen = AddrLength;
-    DataLen = TXdatalen;                      // Bytes Data
+    DataLen = TXdatalen;
+
     while (UCB0CTL1 & UCTXSTP);                 // Ensure stop condition got sent
     UCB0CTL1 |= UCTR + UCTXSTT;                 // transmit mode + start condition (Interrupt happening soon)
     __bis_SR_register(LPM3_bits + GIE);
 }
 
-void i2c_receive_data(unsigned char RXlength)
+
+/*
+ *  i2c_receive_data:
+ *  receive RXlength bytes
+ */
+static void i2c_receive_data(unsigned char RXlength)
 {
     DataLen = RXlength;
-    AddrLen = 0;                            // done by transmit
+    AddrLen = 0;
+
     while (UCB0CTL1 & UCTXSTP);             // Ensure stop condition got sent
     UCB0CTL1 &= ~UCTR ;                     // Clear I2C TX flag
     UCB0CTL1 |= UCTXSTT;                    // I2C start condition
     while (UCB0CTL1 & UCTXSTT);
-    UCB0CTL1 |= UCTXSTP;
-    __bis_SR_register(LPM3_bits + GIE);        // Enter LPM3 w/ interrupts
+    UCB0CTL1 |= UCTXSTP;                    // Stop before receiving (needed)
+    __bis_SR_register(LPM3_bits + GIE);     // Enter LPM3 w/ interrupts
  }
 
 
-void vl6180x_write_byte(unsigned short Reg, unsigned char data)
-{
-    TXData = data;
-    RegAddr = Reg;
-    i2c_transmit_data(2,1);
-}
 
-unsigned char vl6180x_read_byte(unsigned short Reg)
-{
-    RegAddr = Reg;
-    i2c_transmit_data(2,0);
-    i2c_receive_data(1);
+////////////////////////////////////////////////
+//             VL6180X functions              //
+//             Public functions               //
+////////////////////////////////////////////////
 
-    return RXData;
-}
 
+/*
+ *  vl6180x_init:
+ *   - I2C init
+ *   - write first configuration (proprietary registers)
+ */
 void vl6180x_init(void)
 {
+    i2c_init();
+
     if (vl6180x_read_byte(REG_SYS_FRESH_OUT_OF_RST) == 0x01) {
         // Mandatory : private registers
         vl6180x_write_byte(0x0207, 0x01);
@@ -135,12 +155,49 @@ void vl6180x_init(void)
 
 }
 
+
+/*
+ *  vl6180x_write_byte:
+ *   write byte to slave reg
+ */
+void vl6180x_write_byte(unsigned short Reg, unsigned char data)
+{
+    TXData = data;
+    RegAddr = Reg;
+
+    i2c_transmit_data(2,1);
+}
+
+
+/*
+ *  vl6180x_read_byte:
+ *   read byte from slave reg
+ */
+unsigned char vl6180x_read_byte(unsigned short Reg)
+{
+    RegAddr = Reg;
+
+    i2c_transmit_data(2,0);
+    i2c_receive_data(1);
+
+    return RXData;
+}
+
+
+/*
+ *  vl6180x_continuous_shot_range:
+ *   Begin continuous shot range
+ */
 void vl6180x_continuous_shot_range(void)
 {
     vl6180x_write_byte(REG_RANGE_START, 0x03);
 }
 
 
+/*
+ *  vl6180x_single_shot_range:
+ *   perform a single shot range and return said range
+ */
 int vl6180x_single_shot_range(void)
 {
     int result_range = 0;
@@ -153,16 +210,16 @@ int vl6180x_single_shot_range(void)
     }
     result_range = vl6180x_read_byte(REG_RANGE_VAL);
     vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x07);
+
     return result_range;
 }
 
 /*
- *      Interruption routine
+ *      Interruption routine for I2C
  */
 #pragma vector = USCIAB0TX_VECTOR
 __interrupt void USCIAB0TX_ISR(void)
 {
-    //transmitter mode only for now
     switch (AddrLen) {
         case 2:
             UCB0TXBUF = (RegAddr >> 8) & 0xFF;
@@ -173,7 +230,7 @@ __interrupt void USCIAB0TX_ISR(void)
             AddrLen--;
             break;
         case 0:
-            if (DataLen) {                                                    // this part only works with single data
+            if (DataLen) {
                 if (IFG2 & UCB0TXIFG) {
                     UCB0TXBUF = TXData;
                 } else if (IFG2 & UCB0RXIFG) {

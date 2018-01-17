@@ -14,7 +14,6 @@ void main(void)
     clock_init();
     gpio_init();
     lcd_init();
-    i2c_init();
     vl6180x_init();
     vl6180x_continuous_shot_range();
 

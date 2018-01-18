@@ -9,10 +9,15 @@
 
 timerA_state TAstate = Init;
 
+
+/*
+ *  timer_sleep
+ *   counts delay x 62µs
+ */
 void timer_sleep(int delay)
 {
   TA0CCR0 = 2;
-  TA0CTL = TASSEL_1 + MC_2;
+  TA0CTL = TASSEL_1 + MC_1;
   int  i;
   for (i = delay; i > 0; --i) {
     TA0R = 0;
@@ -25,6 +30,11 @@ void timer_sleep(int delay)
   TA0CTL = 0;
 }
 
+
+/*
+ *  timerA_configuration
+ *   counts sec x 1s
+ */
 void timerA_configuration(int sec)
 {
     CCTL0 = CCIE;                   // CCR0 interrupt enabled
@@ -34,12 +44,12 @@ void timerA_configuration(int sec)
 }
 
 
+/*
+ *  clock_init
+ *   Init ACLK/8 for Low-Power purposes
+ */
 void clock_init(void)
 {
-    //Clock Init
-    // Use of ACLK for Low-Power purposes
-
     BCSCTL1 |= DIVA_3;       // ACLK/8
     BCSCTL3 |= XCAP_3;
-
 }

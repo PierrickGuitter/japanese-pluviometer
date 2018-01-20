@@ -21,25 +21,25 @@ void main(void)
 
     while (1) {
         if (btn_triggered == 1) {
+            btn_triggered = 0;
             lcd_display_pluvio(count);
             timerA_configuration(5);
             count = 0;
             __bis_SR_register(LPM3_bits);
-            btn_triggered = 0;
-        } else if (vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x01) {
+        }
+        if (vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x01) {
             error = (vl6180x_read_byte(REG_RESULT_RANGE_STATUS) & 0xF0) >> 4;
-            if (error == 0 && TAstate == LCD_Timer) {
+            if (error == 0 && timer_A_mode == LCD_BL_CTRL) {;
                 count++;
                 // timer (1 sec) for count
+                timer_A_mode = RANGE_MSR_MODE;
                 timerA_configuration(1);
-                TAstate = Prox_detection;
+
                 __bis_SR_register(LPM3_bits);
             }
             vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x07);
-            btn_triggered = 0;
         }
     }
-
 }
 
 
@@ -49,22 +49,10 @@ __interrupt void Port_1()
     if (P1IFG & BIT0) {
         btn_triggered = 1;
         P1IFG &= ~(BIT0);
-    } else if (P1IFG & BIT1) {
+    }else if (P1IFG & BIT1) {
         //btn_triggered = 2;
         P1IFG &= ~(BIT1);
     }
 
 }
 
-// Timer A0 interrupt service routine
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void Timer_A (void)
-{
-    if (TAstate == LCD_Timer) {
-        P1OUT &= ~BIT4;                  // Toggle LCD_BK
-    } else if (TAstate == Prox_detection) {
-        TAstate = LCD_Timer;
-    }
-    TA0CCTL0 = 0;
-    __bic_SR_register_on_exit(LPM3_bits);
-}

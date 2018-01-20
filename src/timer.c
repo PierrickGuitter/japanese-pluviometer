@@ -7,12 +7,12 @@
 #include <msp430.h>
 #include "timer.h"
 
-timerA_state TAstate = Init;
+timerA_state timer_A_mode = LCD_BL_CTRL;
 
 
 /*
  *  timer_sleep
- *   counts delay x 62µs
+ *   counts delay x 500µs
  */
 void timer_sleep(int delay)
 {
@@ -52,4 +52,20 @@ void clock_init(void)
 {
     BCSCTL1 |= DIVA_3;       // ACLK/8
     BCSCTL3 |= XCAP_3;
+}
+
+
+/*
+ *  Timer A0 interrupt service routine
+ */
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void Timer_A (void)
+{
+    if (timer_A_mode == LCD_BL_CTRL) {
+        P1OUT &= ~BIT4;                  // Toggle LCD_BK
+    } else if (timer_A_mode == RANGE_MSR_MODE) {
+        timer_A_mode = LCD_BL_CTRL;
+    }
+    TA0CCTL0 = 0;
+    __bic_SR_register_on_exit(LPM3_bits);
 }

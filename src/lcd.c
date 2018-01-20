@@ -101,15 +101,13 @@ void lcd_init(void)
 
     lcd_request_to_send();
 
-    //lcd_send_cmd(0x33);
-    //lcd_send_cmd(0x32);
     lcd_send_cmd(0x28);
     lcd_send_cmd(0x0E);
     lcd_send_cmd(0x06);
 
     lcd_clear_screen();
 
-    TAstate = LCD_Timer;
+    timer_A_mode = LCD_BL_CTRL;
 }
 
 void lcd_print(char* string)

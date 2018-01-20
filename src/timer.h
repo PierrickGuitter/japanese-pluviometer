@@ -8,8 +8,8 @@
 #ifndef TIMER_H_
 #define TIMER_H_
 
-typedef enum { Init=0, LCD_Timer=1, Prox_detection=2 } timerA_state;
-extern timerA_state TAstate;
+typedef enum { LCD_BL_CTRL=0, RANGE_MSR_MODE=1 } timerA_state;
+extern timerA_state timer_A_mode;
 
 /*
  *  clock_init

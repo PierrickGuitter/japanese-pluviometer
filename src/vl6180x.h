@@ -70,4 +70,10 @@ int vl6180x_single_shot_range(void);
  */
 void vl6180x_continuous_shot_range(void);
 
+/*
+ *  vl6180x_history_ctrl
+ *      - mode              : history buffer functionnality: 0 --> disabled, 1 --> range buffering, 2 --> ALS buffering
+ */
+void vl6180x_history_ctrl(char mode);
+
 #endif /* VL6180X_H_ */

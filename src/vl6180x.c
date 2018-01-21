@@ -128,7 +128,7 @@ void vl6180x_init(void)
 
     vl6180x_write_byte(REG_SYS_GPI1_MODE,0x30);
     vl6180x_write_byte(REG_SYS_INT_GPIO, 0x01);
-    vl6180x_write_byte(REG_SYS_HIST_CTRL, 0x01);
+    vl6180x_history_ctrl(0);
     vl6180x_write_byte(REG_RANGE_THRESH_LOW, 0x80);  //80 mm
     vl6180x_write_byte(REG_RANGE_INTERMSR_PERIOD, 0x0F); //every 200ms
     vl6180x_write_byte(REG_RANGE_CONV_TIME,0x1D);
@@ -212,6 +212,29 @@ int vl6180x_single_shot_range(void)
     vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x07);
 
     return result_range;
+}
+
+
+/*
+ *  vl6180x_history_ctrl:
+ *      Chooses mode for history buffer: disabled(0), storing range(1), or ALS(2)
+ */
+void vl6180x_history_ctrl(char mode)
+{
+    switch (mode) {
+    case 0:
+        // history buffer disabled
+        vl6180x_write_byte(REG_SYS_HIST_CTRL, 0x00);
+        break;
+    case 1:
+        // history buffers range measures
+        vl6180x_write_byte(REG_SYS_HIST_CTRL, 0x01);
+        break;
+    case 2:
+        // history buffers ALS measures
+        vl6180x_write_byte(REG_SYS_HIST_CTRL, 0x11);
+        break;
+    }
 }
 
 /*

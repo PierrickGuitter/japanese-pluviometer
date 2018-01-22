@@ -100,4 +100,9 @@ void vl6180x_history_ctrl(char mode);
  */
 void vl6180x_check_enables(vl6180x_check_enables_mode ce_mode);
 
+/*
+ *  vl6180x_set_vhv_rate: repeat re-calibration rate
+ */
+void vl6180x_set_vhv_rate(char rate);
+
 #endif /* VL6180X_H_ */

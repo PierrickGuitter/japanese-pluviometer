@@ -138,6 +138,8 @@ void vl6180x_init(void)
 
     // allow only ignore range
     vl6180x_check_enables(SNR_AND_IGNORE_AND_ECE_MODE);
+    vl6180x_set_vhv_rate(255);
+
     vl6180x_write_byte(REG_RANGE_IGNORE_HEIGHT,0x30);
     vl6180x_write_byte(REG_RANGE_IGNORE_THRESH,0x0F);
 
@@ -146,10 +148,7 @@ void vl6180x_init(void)
     vl6180x_write_byte(REG_RANGE_CROSSTALK_HEIGHT);
     vl6180x_write_byte(REG_RANGE_ECE_ESTIMATE);
     vl6180x_write_byte(REG_RANGE_P2P_OFFSET);
-    vl6180x_write_byte(REG_RANGE_MAX_AMB_LVL);
-    vl6180x_write_byte(REG_RANGE_CHECK_ENABLES);
-    vl6180x_write_byte(REG_RANGE_VHV_RECALIBRATE);
-    vl6180x_write_byte(REG_RANGE_VHV_REPEAT_RATE);*/
+    vl6180x_write_byte(REG_RANGE_MAX_AMB_LVL);*/
 
 
 }
@@ -271,6 +270,16 @@ void vl6180x_check_enables(vl6180x_check_enables_mode ce_mode)
         break;
     }
 }
+
+
+/*
+ *  vl6180x_set_vhv_rate: set sensor calibration every X (rate)
+ */
+void vl6180x_set_vhv_rate(char rate)
+{
+    vl6180x_write_byte(REG_RANGE_VHV_REPEAT_RATE, rate);
+}
+
 
 /*
  *      Interruption routine for I2C

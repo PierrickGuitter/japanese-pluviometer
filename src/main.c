@@ -3,13 +3,14 @@
 #include "lcd.h"
 #include "timer.h"
 
-unsigned char btn_triggered = 0, error = 0;
-unsigned int count = 0;
-char* CountWrite;
+unsigned char btn_triggered = 0;
 
 void main(void)
 {
     WDTCTL = WDTPW + WDTHOLD;             // Stop watchdog timer
+    vl6180x_result_range_code status;
+    unsigned int count = 0;
+
 
     clock_init();
     gpio_init();
@@ -27,9 +28,10 @@ void main(void)
             count = 0;
             __bis_SR_register(LPM3_bits);
         }
+
         if (vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x01) {
-            error = (vl6180x_read_byte(REG_RESULT_RANGE_STATUS) & 0xF0) >> 4;
-            if (error == 0 && timer_A_mode == LCD_BL_CTRL) {;
+            status =  vl6180x_get_status_range_result();
+            if (status == NO_ERROR && timer_A_mode == LCD_BL_CTRL) {;
                 count++;
                 // timer (1 sec) for count
                 timer_A_mode = RANGE_MSR_MODE;

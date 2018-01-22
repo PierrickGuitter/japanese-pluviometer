@@ -50,6 +50,19 @@ typedef enum {
     SNR_AND_IGNORE_AND_ECE_MODE=7
 } vl6180x_check_enables_mode;
 
+
+typedef enum {
+    NO_ERROR=0,
+    SYS_ERROR=1,
+    EARLY_CONVERGENCE=2,
+    MAX_CONVERGENCE=3,
+    NO_TARGET_IGNORE=4,
+    MAX_SNR=5,
+    RANGE_UNDERFLOW=6,
+    RANGE_OVERFLOW=7,
+    UNKNOWN_ERROR=8,
+} vl6180x_result_range_code;
+
 /*
  *  vl6180x_init
  */
@@ -104,5 +117,12 @@ void vl6180x_check_enables(vl6180x_check_enables_mode ce_mode);
  *  vl6180x_set_vhv_rate: repeat re-calibration rate
  */
 void vl6180x_set_vhv_rate(char rate);
+
+/*
+ *  vl6180x_get_status_range_result:
+ *      get status from vl6180x range result reg
+ *      - ret value         : STATUS (see vl6180x_result_range_code, above)
+ */
+vl6180x_result_range_code vl6180x_get_status_range_result(void);
 
 #endif /* VL6180X_H_ */

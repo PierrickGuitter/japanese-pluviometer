@@ -273,11 +273,69 @@ void vl6180x_check_enables(vl6180x_check_enables_mode ce_mode)
 
 
 /*
- *  vl6180x_set_vhv_rate: set sensor calibration every X (rate)
+ *  vl6180x_set_vhv_rate:
+ *      set sensor calibration every X (rate)
  */
 void vl6180x_set_vhv_rate(char rate)
 {
     vl6180x_write_byte(REG_RANGE_VHV_REPEAT_RATE, rate);
+}
+
+
+/*
+ *  vl6180x_get_status_range_result:
+ *      get status from vl6180x range result reg:
+ *          NO_ERROR
+ *          SYS_ERROR
+ *          EARLY_CONVERGENCE
+ *          MAX_CONVERGENCE
+ *          NO_TARGET_IGNORE
+ *          MAX_SNR
+ *          RANGE_UNDERFLOW
+ *          RANGE_OVERFLOW
+ *          UNKNOWN_ERROR
+ */
+vl6180x_result_range_code vl6180x_get_status_range_result(void)
+{
+    char status = (vl6180x_read_byte(REG_RESULT_RANGE_STATUS) & 0xF0) >> 4;
+    vl6180x_result_range_code ret;
+    switch (status) {
+    case 0:
+        ret = NO_ERROR;
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        ret = SYS_ERROR;
+        break;
+    case 6:
+        ret = EARLY_CONVERGENCE;
+        break;
+    case 7:
+        ret = MAX_CONVERGENCE;
+        break;
+    case 8:
+        ret = NO_TARGET_IGNORE;
+        break;
+    case 11:
+        ret = MAX_SNR;
+        break;
+    case 12:
+    case 14:
+        ret = RANGE_UNDERFLOW;
+        break;
+    case 13:
+    case 15:
+        ret = RANGE_OVERFLOW;
+        break;
+    default:
+        ret = UNKNOWN_ERROR;
+        break;
+    }
+
+    return ret;
 }
 
 

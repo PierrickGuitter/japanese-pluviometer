@@ -123,31 +123,29 @@ void vl6180x_init(void)
         vl6180x_write_byte(REG_SYS_FRESH_OUT_OF_RST,0x00);
     }
 
-    vl6180x_write_byte(REG_SYS_GRP_PARAM_HOLD,0x01);
+    vl6180x_set_date_safe_update(1);
 
     vl6180x_write_byte(REG_SYS_GPI1_MODE,0x30);
     vl6180x_write_byte(REG_SYS_INT_GPIO, 0x01);
-    vl6180x_history_ctrl(0);
     vl6180x_write_byte(REG_RANGE_THRESH_LOW, 0x80);  //80 mm
-    vl6180x_write_byte(REG_RANGE_INTERMSR_PERIOD, 0x0F); //every 200ms
-    vl6180x_write_byte(REG_RANGE_CONV_TIME,0x1D);
 
+    vl6180x_set_date_safe_update(0);
 
-    vl6180x_write_byte(REG_SYS_GRP_PARAM_HOLD,0x00);
-
-
-    // allow only ignore range
+    vl6180x_history_ctrl(0);
     vl6180x_check_enables(SNR_AND_IGNORE_AND_ECE_MODE);
     vl6180x_set_vhv_rate(255);
 
+    vl6180x_write_byte(REG_RANGE_CONV_TIME,0x1D);
+    vl6180x_write_byte(REG_RANGE_INTERMSR_PERIOD, 0x0F); //every 200ms
     vl6180x_write_byte(REG_RANGE_IGNORE_HEIGHT,0x30);
     vl6180x_write_byte(REG_RANGE_IGNORE_THRESH,0x0F);
 
     /*
     vl6180x_write_byte(REG_RANGE_CROSSTALK_RATE);
     vl6180x_write_byte(REG_RANGE_CROSSTALK_HEIGHT);
-    vl6180x_write_byte(REG_RANGE_ECE_ESTIMATE);
     vl6180x_write_byte(REG_RANGE_P2P_OFFSET);
+
+    vl6180x_write_byte(REG_RANGE_ECE_ESTIMATE);
     vl6180x_write_byte(REG_RANGE_MAX_AMB_LVL);*/
 
 
@@ -336,6 +334,22 @@ vl6180x_result_range_code vl6180x_get_status_range_result(void)
     }
 
     return ret;
+}
+
+
+/*
+ *  vl6180x_set_date_safe_update:
+ *      holding REG REG_SYS_GRP_PARAM_HOLD to 1 enables
+ *      to safe update the params listed below. Put it back
+ *      to 0 to release and operate range measurements.
+ *      List:
+ *      REG_SYS_INT_GPIO
+ *      REG_RANGE_THRESH_HIGH
+ *      REG_RANGE_THRESH_LOW
+ */
+void vl6180x_set_date_safe_update(char hold)
+{
+    vl6180x_write_byte(REG_SYS_GRP_PARAM_HOLD, hold);
 }
 
 

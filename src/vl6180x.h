@@ -125,4 +125,12 @@ void vl6180x_set_vhv_rate(char rate);
  */
 vl6180x_result_range_code vl6180x_get_status_range_result(void);
 
+/*
+ *  vl6180x_set_date_safe_update:
+ *      holding REG REG_SYS_GRP_PARAM_HOLD to 1 enables
+ *      to safe update some params. Put it back
+ *      to 0 to release and operate range measurements.
+ */
+void vl6180x_set_date_safe_update(char hold);
+
 #endif /* VL6180X_H_ */

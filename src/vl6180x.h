@@ -39,6 +39,16 @@
 #define REG_INTERRUPT_STATUS_GPIO   0x004F
 #define REG_RANGE_VAL               0x0062
 
+typedef enum {
+    DISABLED_MODE=0,
+    ECE_MODE_ONLY=1,
+    IGNORE_MODE_ONLY=2,
+    IGNORE_AND_ECE_MODE=3,
+    SNR_MODE_ONLY=4,
+    SNR_AND_ECE_MODE=5,
+    SNR_AND_IGNORE_MODE=6,
+    SNR_AND_IGNORE_AND_ECE_MODE=7
+} vl6180x_check_enables_mode;
 
 /*
  *  vl6180x_init
@@ -75,5 +85,19 @@ void vl6180x_continuous_shot_range(void);
  *      - mode              : history buffer functionnality: 0 --> disabled, 1 --> range buffering, 2 --> ALS buffering
  */
 void vl6180x_history_ctrl(char mode);
+
+/*
+ *  vl6180x_check_enables
+ *      - ce_mode           : which check are enabled:
+ *      DISABLED_MODE=0,
+ *      ECE_MODE_ONLY=1,
+ *      IGNORE_MODE_ONLY=2,
+ *      IGNORE_AND_ECE_MODE=3,
+ *      SNR_MODE_ONLY=4,
+ *      SNR_AND_ECE_MODE=5,
+ *      SNR_AND_IGNORE_MODE=6,
+ *      SNR_AND_IGNORE_AND_ECE_MODE=7
+ */
+void vl6180x_check_enables(vl6180x_check_enables_mode ce_mode);
 
 #endif /* VL6180X_H_ */

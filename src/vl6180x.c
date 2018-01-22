@@ -9,7 +9,6 @@
 unsigned char DataLen = 0, AddrLen = 0, TXData = 0, RXData = 0;
 unsigned short RegAddr = 0;
 
-
 ////////////////////////////////////////////////
 //  I2C Init, receive and transmit functions  //
 //  Only called by vl6180x functions          //
@@ -138,7 +137,7 @@ void vl6180x_init(void)
 
 
     // allow only ignore range
-    vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x02);
+    vl6180x_check_enables(SNR_AND_IGNORE_AND_ECE_MODE);
     vl6180x_write_byte(REG_RANGE_IGNORE_HEIGHT,0x30);
     vl6180x_write_byte(REG_RANGE_IGNORE_THRESH,0x0F);
 
@@ -233,6 +232,42 @@ void vl6180x_history_ctrl(char mode)
     case 2:
         // history buffers ALS measures
         vl6180x_write_byte(REG_SYS_HIST_CTRL, 0x11);
+        break;
+    }
+}
+
+
+/*
+ *  vl6180x_check_enables
+ *  enable or disable 3 functionalities: check signal-to-noise ratio,
+ *  check early convergence estimate, and check ignore range
+ */
+void vl6180x_check_enables(vl6180x_check_enables_mode ce_mode)
+{
+    switch (ce_mode) {
+    case DISABLED_MODE:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x00);
+        break;
+    case ECE_MODE_ONLY:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x01);
+        break;
+    case IGNORE_MODE_ONLY:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x02);
+        break;
+    case IGNORE_AND_ECE_MODE:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x03);
+        break;
+    case SNR_MODE_ONLY:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x10);
+        break;
+    case SNR_AND_ECE_MODE:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x11);
+        break;
+    case SNR_AND_IGNORE_MODE:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x12);
+        break;
+    case SNR_AND_IGNORE_AND_ECE_MODE:
+        vl6180x_write_byte(REG_RANGE_CHECK_ENABLES,0x13);
         break;
     }
 }

@@ -133,4 +133,17 @@ vl6180x_result_range_code vl6180x_get_status_range_result(void);
  */
 void vl6180x_set_date_safe_update(char hold);
 
+/*
+ *  vl6180x_set_convergence_time:
+ *      Set Convergence time
+ */
+void vl6180x_set_convergence_time(char cv_time);
+
+/*
+ *  vl6180x_set_convergence_time:
+ *      Set intermeasurement period:
+ *      parameter to pass is divided by 10.
+ */
+void vl6180x_set_intermeasurement_period(char period);
+
 #endif /* VL6180X_H_ */

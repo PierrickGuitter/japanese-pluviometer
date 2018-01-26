@@ -11,7 +11,6 @@ void main(void)
     vl6180x_result_range_code status;
     unsigned int count = 0;
 
-
     clock_init();
     gpio_init();
     lcd_init();

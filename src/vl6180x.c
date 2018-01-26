@@ -199,8 +199,8 @@ int vl6180x_single_shot_range(void)
     int result_range = 0;
 
     vl6180x_write_byte(REG_RANGE_START, 0x01);
-    while (!(vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x04)) {
-        if (vl6180x_read_byte(REG_RESULT_RANGE_STATUS) != 0x00) {
+    while (vl6180x_get_gpio_int_status() != NEW_SAMPLE) {
+        if (vl6180x_get_status_range_result() != NO_ERROR) {
             return vl6180x_read_byte(REG_RESULT_RANGE_STATUS);
         }
     }
@@ -370,6 +370,44 @@ void vl6180x_set_convergence_time(char cv_time)
 void vl6180x_set_intermeasurement_period(char period)
 {
     vl6180x_write_byte(REG_RANGE_INTERMSR_PERIOD, (period / 10));
+}
+
+
+/*
+ *  vl6180x_get_gpio_int_status:
+ *      get interrupt GPIO status from reg:
+ *          NO_THRESHOLD
+ *          LOW_THRESHOLD
+ *          HIGH_THRESHOLD
+ *          OUT_OF_WINDOW_THRESHOLD
+ *          NEW_SAMPLE
+ */
+vl6180x_gpio_status vl6180x_get_gpio_int_status()
+{
+    vl6180x_gpio_status ret;
+    char status = vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x07;
+
+    switch (status) {
+    case 0:
+        ret = NO_THRESHOLD;
+        break;
+    case 1:
+        ret = LOW_THRESHOLD;
+        break;
+    case 2:
+        ret = HIGH_THRESHOLD;
+        break;
+    case 3:
+        ret = OUT_OF_WINDOW_THRESHOLD;
+        break;
+    case 4:
+        ret = NEW_SAMPLE;
+        break;
+    default:
+        break;
+    }
+
+    return ret;
 }
 
 

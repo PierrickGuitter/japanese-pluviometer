@@ -28,7 +28,7 @@ void main(void)
             __bis_SR_register(LPM3_bits);
         }
 
-        if (vl6180x_read_byte(REG_INTERRUPT_STATUS_GPIO) & 0x01) {
+        if (vl6180x_get_gpio_int_status() == LOW_THRESHOLD) {
             status =  vl6180x_get_status_range_result();
             if (status == NO_ERROR && timer_A_mode == LCD_BL_CTRL) {;
                 count++;

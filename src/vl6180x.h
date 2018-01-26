@@ -63,6 +63,16 @@ typedef enum {
     UNKNOWN_ERROR=8,
 } vl6180x_result_range_code;
 
+
+typedef enum {
+    NO_THRESHOLD=0,
+    LOW_THRESHOLD=1,
+    HIGH_THRESHOLD=2,
+    OUT_OF_WINDOW_THRESHOLD=3,
+    NEW_SAMPLE=4
+} vl6180x_gpio_status;
+
+
 /*
  *  vl6180x_init
  */
@@ -145,5 +155,16 @@ void vl6180x_set_convergence_time(char cv_time);
  *      parameter to pass is divided by 10.
  */
 void vl6180x_set_intermeasurement_period(char period);
+
+/*
+ *  vl6180x_get_gpio_int_status:
+ *      get interrupt GPIO status from reg:
+ *          NO_THRESHOLD
+ *          LOW_THRESHOLD
+ *          HIGH_THRESHOLD
+ *          OUT_OF_WINDOW_THRESHOLD
+ *          NEW_SAMPLE
+ */
+vl6180x_gpio_status vl6180x_get_gpio_int_status();
 
 #endif /* VL6180X_H_ */

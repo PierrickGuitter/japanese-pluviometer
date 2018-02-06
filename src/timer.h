@@ -8,7 +8,11 @@
 #ifndef TIMER_H_
 #define TIMER_H_
 
-typedef enum { LCD_BL_CTRL=0, RANGE_MSR_MODE=1 } timerA_state;
+typedef enum {
+    LCD_BL_CTRL=0,
+    RANGE_MSR_MODE=1
+} timerA_state;
+
 extern timerA_state timer_A_mode;
 
 /*

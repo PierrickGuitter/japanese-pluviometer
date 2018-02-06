@@ -125,7 +125,7 @@ void vl6180x_init(void)
 
     vl6180x_set_date_safe_update(1);
 
-    vl6180x_write_byte(REG_SYS_GPI1_MODE,0x30);
+    vl6180x_gpio1_configuration(1,1);
     vl6180x_write_byte(REG_SYS_INT_GPIO, 0x01);
     vl6180x_write_byte(REG_RANGE_THRESH_LOW, 0x80);  //80 mm
 
@@ -410,6 +410,30 @@ vl6180x_gpio_status vl6180x_get_gpio_int_status()
     return ret;
 }
 
+
+/*
+ *  vl6180x_gpio1_configuration:
+ *      GPIO 1 configuration:
+ *          irq sets the interrupt functionality (1 --> on, other --> off)
+ *          polarity sets whether it is active high (1) or low (0)
+ */
+void vl6180x_gpio1_configuration(unsigned char irq, unsigned char polarity)
+{
+    unsigned char byte = 0;
+
+    if (irq == 1) {
+        byte |= 0x10;
+        if (polarity == 1) {
+            byte |= 0x20;
+        } else {
+            byte &= ~0x20;
+        }
+    } else {
+        byte &= ~0x10;
+    }
+
+    vl6180x_write_byte(REG_SYS_GPI1_MODE,byte);
+}
 
 /*
  *      Interruption routine for I2C

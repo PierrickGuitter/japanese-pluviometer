@@ -167,4 +167,10 @@ void vl6180x_set_intermeasurement_period(char period);
  */
 vl6180x_gpio_status vl6180x_get_gpio_int_status();
 
+/*
+ *  vl6180x_gpio1_configuration:
+ *      sets gpio 1 configuration (interrupt enable + polarity)
+ */
+void vl6180x_gpio1_configuration(unsigned char irq, unsigned char polarity);
+
 #endif /* VL6180X_H_ */

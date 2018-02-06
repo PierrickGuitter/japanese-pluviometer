@@ -173,4 +173,10 @@ vl6180x_gpio_status vl6180x_get_gpio_int_status();
  */
 void vl6180x_gpio1_configuration(unsigned char irq, unsigned char polarity);
 
+/*
+ *  vl6180x_clear_range_irq:
+ *      clear range interrupt and last error
+ */
+void vl6180x_clear_range_irq(void);
+
 #endif /* VL6180X_H_ */

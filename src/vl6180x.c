@@ -205,7 +205,7 @@ int vl6180x_single_shot_range(void)
         }
     }
     result_range = vl6180x_read_byte(REG_RANGE_VAL);
-    vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x07);
+    vl6180x_clear_range_irq();
 
     return result_range;
 }
@@ -433,6 +433,19 @@ void vl6180x_gpio1_configuration(unsigned char irq, unsigned char polarity)
     }
 
     vl6180x_write_byte(REG_SYS_GPI1_MODE,byte);
+}
+
+
+/*
+ *  vl6180x_clear_range_irq:
+ *      clear range interrupt and last error
+ *      bit 0 : Range
+ *      bit 1 : ALS (unused here)
+ *      bit 2 : Error
+ */
+void vl6180x_clear_range_irq(void)
+{
+    vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x05);
 }
 
 /*

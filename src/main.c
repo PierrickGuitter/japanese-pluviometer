@@ -38,7 +38,7 @@ void main(void)
 
                 __bis_SR_register(LPM3_bits);
             }
-            vl6180x_write_byte(REG_SYS_INT_CLEAR, 0x07);
+            vl6180x_clear_range_irq();
         }
     }
 }
